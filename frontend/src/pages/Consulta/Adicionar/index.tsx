@@ -27,13 +27,15 @@ interface IConsultaProps {
   data: string;
   medico: string;
   paciente: string;
+  observacoes: string;
 }
 
 const consultaDefault = {
   local: '',
   data: '',
   medico: '',
-  paciente: ''
+  paciente: '',
+  observacoes: ''
 }
 
 const AdicionarConsulta: React.FC = () => {
@@ -98,6 +100,13 @@ const AdicionarConsulta: React.FC = () => {
     });
   }
 
+  const onChangeObservacoes = (event: any) => {
+    setConsulta({
+      ...consulta,
+      observacoes: event.target.value
+    });
+  }
+
   return (
     <div>
       <Header />
@@ -144,6 +153,11 @@ const AdicionarConsulta: React.FC = () => {
             <Form.Control.Feedback type="invalid">
               Por favor selecione um paciente.
             </Form.Control.Feedback>
+          </Form.Group>
+
+          <Form.Group controlId="formAddConsultaObservacoes">
+            <Form.Label>Observações</Form.Label>
+            <Form.Control as="textarea" rows={2} onChange={onChangeObservacoes}/>
           </Form.Group>
 
           <Button variant="outline-dark" className="mr-3" onClick={handelCancel}>
