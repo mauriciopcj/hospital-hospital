@@ -12,9 +12,9 @@ module.exports = (sequelize, DataTypes) => {
       tableName: 'consultas'
   });
 
-  // Consulta.associate = function(models) {
-  //     Artigo.belongsTo(models.Usuario, { as: 'usuario', foreignKey: 'usuario_id' })
-  // };
+  Consulta.associate = function(models) {
+    Consulta.hasMany(models.Receita, { as: 'receitas', foreignKey: 'consulta_id' })
+  };
   
   return Consulta;
 };
