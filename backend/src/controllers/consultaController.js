@@ -1,4 +1,4 @@
-import { Consulta } from '../database/models';
+import { Consulta, Receita } from '../database/models';
 
 export default {
 
@@ -16,7 +16,12 @@ export default {
 
   index: async (req, res, next) => {
     try {
-      await Consulta.findAll(req.body).then(response => {
+      await Consulta.findAll({ 
+        include: [{
+          model: Receita,
+          as: 'receitas'
+        }]
+      }).then(response => {
         res.status(200).json({ consultas: response });
       }).catch(error => {
         res.status(400).json({ error });
@@ -28,7 +33,16 @@ export default {
 
   show: async (req, res, next) => {
     try {
-      await Consulta.findOne({ where: { id: req.params.id }}).then(response => {
+      await Consulta.findOne({ 
+        where: { id: req.params.id },        
+        include: [{
+          model: Receita,
+          as: 'receitas',
+          attributes: {
+            exclude: ['consulta_id']
+          },
+        }]
+      }).then(response => {
         res.status(200).json({ consulta: response });
       }).catch(error => {
         res.status(400).json({ error });
