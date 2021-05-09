@@ -17,11 +17,11 @@ import api from '../../../services/api';
 
 const opcoes = [
   {
-    label: "Fulano",
+    label: "Usuário 1",
     value: 1
   },
   {
-    label: "Cicrano",
+    label: "Usuário 2",
     value: 2
   },
 ]
@@ -44,7 +44,7 @@ const consultaDefault = {
 
 type TParams = { id: string };
 
-function EditarConsulta({ match }: RouteComponentProps<TParams>) {
+const EditarConsulta: React.FC<RouteComponentProps<TParams>> = ({ match }) => {
 
   const { id } = match.params;
 
@@ -73,21 +73,21 @@ function EditarConsulta({ match }: RouteComponentProps<TParams>) {
 
   const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
     const form = event.currentTarget;
+    
     if (form.checkValidity() === false) {
       event.preventDefault();
       event.stopPropagation();
+    } else {
+      event.preventDefault();
+  
+      api.put(`/consultas/${id}`, consulta).then(response => {  
+        history.push('/consultas/index');
+      }).catch(error => {
+        console.log(error);
+      })
     }
 
     setValidated(true);
-
-    event.preventDefault();
-
-    api.put(`/consultas/${id}`, consulta).then(response => {
-
-      history.push('/consultas/index');
-    }).catch(error => {
-      console.log(error);
-    })
   }
 
   const onChangeLocal = (event: any) => {
@@ -125,9 +125,27 @@ function EditarConsulta({ match }: RouteComponentProps<TParams>) {
     });
   }
 
+  const items = [
+    {
+      href: "/",
+      name: "Home",
+      isActive: false,
+    },
+    {
+      href: "/consultas/index",
+      name: "Consultas",
+      isActive: false,
+    },
+    {
+      href: "/consultas/editar",
+      name: "Editar",
+      isActive: true,
+    },
+  ]
+
   return (
     <div>
-      <Header />
+      <Header items={[...items]}/>
 
       <Container className="mt-5">
         <Form noValidate validated={validated} onSubmit={handleSubmit}>

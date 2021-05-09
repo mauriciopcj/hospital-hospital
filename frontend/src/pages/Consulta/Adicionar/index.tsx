@@ -13,11 +13,11 @@ import api from '../../../services/api';
 
 const opcoes = [
   {
-    label: "Fulano",
+    label: "Usuário 1",
     value: 1
   },
   {
-    label: "Cicrano",
+    label: "Usuário 2",
     value: 2
   },
 ]
@@ -49,27 +49,26 @@ const AdicionarConsulta: React.FC = () => {
     setConsulta(consultaDefault);
   }, []);
 
-  const handelCancel = () => {
+  const handleCancel = () => {
     history.push('/consultas/index');
   }
 
   const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
     const form = event.currentTarget;
+
     if (form.checkValidity() === false) {
       event.preventDefault();
       event.stopPropagation();
+    } else {
+      event.preventDefault();
+  
+      api.post('/consultas', consulta).then(response => {  
+        history.push('/consultas/index');
+      }).catch(error => {
+        console.log(error);
+      })
     }
-
     setValidated(true);
-
-    event.preventDefault();
-
-    api.post('/consultas', consulta).then(response => {
-
-      history.push('/consultas/index');
-    }).catch(error => {
-      console.log(error);
-    })
   }
 
   const onChangeLocal = (event: any) => {
@@ -107,9 +106,27 @@ const AdicionarConsulta: React.FC = () => {
     });
   }
 
+  const items = [
+    {
+      href: "/",
+      name: "Home",
+      isActive: false,
+    },
+    {
+      href: "/consultas/index",
+      name: "Consultas",
+      isActive: false,
+    },
+    {
+      href: "/consultas/adicionar",
+      name: "Adicionar",
+      isActive: true,
+    },
+  ]
+
   return (
     <div>
-      <Header />
+      <Header items={[...items]}/>
 
       <Container className="mt-5">
         <Form noValidate validated={validated} onSubmit={handleSubmit}>
@@ -160,7 +177,7 @@ const AdicionarConsulta: React.FC = () => {
             <Form.Control as="textarea" rows={2} onChange={onChangeObservacoes}/>
           </Form.Group>
 
-          <Button variant="outline-dark" className="mr-3" onClick={handelCancel}>
+          <Button variant="outline-dark" className="mr-3" onClick={handleCancel}>
             Cancelar
           </Button>
 

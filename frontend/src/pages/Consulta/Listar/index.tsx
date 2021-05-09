@@ -22,6 +22,17 @@ interface IConsultaProps {
   paciente: number;
 }
 
+const opcoes = [
+  {
+    label: "Usuário 1",
+    value: 1
+  },
+  {
+    label: "Usuário 2",
+    value: 2
+  },
+]
+
 const ConsultaListar: React.FC = () => {
 
   const history = useHistory();
@@ -44,9 +55,22 @@ const ConsultaListar: React.FC = () => {
     return moment(date).format('DD-MM-YYYY HH:MM:SS');
   }
 
+  const items = [
+    {
+      href: "/",
+      name: "Home",
+      isActive: false,
+    },
+    {
+      href: "/consultas/index",
+      name: "Consultas",
+      isActive: true,
+    },
+  ]
+
   return (
     <>
-      <Header />
+      <Header items={[...items]}/>
 
       <Container className="mt-5">
         <Table bordered hover>
@@ -66,11 +90,30 @@ const ConsultaListar: React.FC = () => {
                 <tr key={"consult_list_item_" + c.id}>
                   <td>{c.local}</td>
                   <td>{formateDate(c.data)}</td>
-                  <td>{c.medico}</td>
-                  <td>{c.paciente}</td>
-                  <td>
-                    <Button variant="outline-dark" onClick={() => history.push(`/consultas/editar/${c.id}`)}>
+                  <td>{opcoes[c.medico-1].label}</td>
+                  <td>{opcoes[c.paciente-1].label}</td>
+                  <td >
+                    <Button 
+                      style={{ marginRight: 10 }}
+                      variant="outline-dark" 
+                      onClick={() => history.push(`/consultas/editar/${c.id}`)}
+                    >
                       Editar
+                    </Button> 
+
+                    <Button 
+                      style={{ marginRight: 10 }}
+                      variant="outline-dark" 
+                      onClick={() => history.push(`/consultas/detalhe/${c.id}`)}
+                    >
+                      Detalhes
+                    </Button>
+
+                    <Button 
+                      variant="outline-dark" 
+                      onClick={() => history.push(`/receitas/adicionar/${c.id}`)}
+                    >
+                      Add Receita
                     </Button>  
                   </td>
                 </tr>
