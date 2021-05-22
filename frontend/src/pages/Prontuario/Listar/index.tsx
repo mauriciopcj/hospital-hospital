@@ -21,12 +21,20 @@ import {
 
 import api from '../../../services/api';
 
-interface IConsultaProps {
+interface ICirurgiaProps {
   id: number;
-  local: string;
-  data: string;
-  medico: number;
-  paciente: number;
+  nome: string;
+  descricao: string;
+  data_entrada: string;
+  data_saida: string;
+}
+
+interface IProntuarioProps {
+  id: number;
+  doencas: string;
+  alergias: string;
+  medicamentos: string;
+  cirurgias: ICirurgiaProps[];
 }
 
 const opcoes = [
@@ -40,28 +48,27 @@ const opcoes = [
   },
 ]
 
-const ConsultaListar: React.FC = () => {
+const ProntuarioListar: React.FC = () => {
 
   const history = useHistory();
 
-  const [consultas, setConsultas] = useState<IConsultaProps[]>();
+  const [prontuarios, setProntuarios] = useState<IProntuarioProps[]>();
   const [size, setSize] = useState(10);
   const [offset, setOffset] = useState(0);
   const [pages, setPages] = useState(1);
 
   useEffect(() => {
-    get_consultas();
+    get_prontuarios();
   },[]);
 
   useEffect(() => {
-    get_consultas();
+    get_prontuarios();
   },[size, offset]);
 
-  const get_consultas = () => {
-    api.get(`/consultas?limit=${size}&offset=${offset}`).then(response => {
-      const { consultas, count } = response.data;
-
-      setConsultas(consultas);
+  const get_prontuarios = () => {
+    api.get(`/prontuarios?limit=${size}&offset=${offset}`).then(response => {
+      const { prontuarios, count } = response.data;
+      setProntuarios(prontuarios);
       setPages((count % size > 0) ? Math.floor(count / size) + 1 : count / size);
     }).catch(error => {
       console.log(error);
@@ -81,7 +88,7 @@ const ConsultaListar: React.FC = () => {
   }
 
   const handleAdicionar = () => {
-    history.push("/consultas/adicionar");
+    history.push("/prontuarios/adicionar");
   }
 
   const formateDate = (date: string) => {
@@ -95,46 +102,43 @@ const ConsultaListar: React.FC = () => {
       isActive: false,
     },
     {
-      href: "/consultas/index",
-      name: "Consultas",
+      href: "/prontuarios/index",
+      name: "Prontuários",
       isActive: true,
-    },
+    },    
   ]
 
   return (
-    <>
+    <div style={{ background: "#f3f3f3", minHeight: "100vh" }}>
       <Header items={[...items]}/>
 
-      <Container className="mt-5">
-        <Button className="mb-3" variant="dark" onClick={handleAdicionar}>
-          Adicionar
-        </Button>
+      <Container>
+        
+        <h3 className="mb-3">Prontuários</h3>
 
-        <Table bordered hover size="sm">
+        <Table hover size="sm">
           <thead>
             <tr>
-              <th>Local</th>
-              <th>Data</th>
-              <th>Medico</th>
-              <th>Paciente</th>
-              <th>Ações</th>
+              <th>Doenças</th>
+              <th>Medicamentos</th>
+              <th>Alergias</th>
+              <th style={{ display: "flex", justifyContent: "flex-end" }}>Ações</th>
             </tr>
           </thead>
           
           <tbody>
-            {consultas && consultas.map(c => {
+            {prontuarios && prontuarios.map(p => {
               return (
-                <tr key={"consult_list_item_" + c.id}>
-                  <td>{c.local}</td>
-                  <td>{formateDate(c.data)}</td>
-                  <td>{opcoes[c.medico-1].label}</td>
-                  <td>{opcoes[c.paciente-1].label}</td>
-                  <td >
+                <tr key={"pront_list_item_" + p.id}>
+                  <td>{p.doencas}</td>
+                  <td>{p.medicamentos}</td>
+                  <td>{p.alergias}</td>
+                  <td style={{ display: "flex", justifyContent: "flex-end" }}>
                     <Button 
                       style={{ marginRight: 10 }}
                       variant="outline-dark" 
                       size="sm"
-                      onClick={() => history.push(`/consultas/editar/${c.id}`)}
+                      onClick={() => history.push(`/consultas/editar/${p.id}`)}
                     >
                       <MdEdit />
                     </Button> 
@@ -143,7 +147,7 @@ const ConsultaListar: React.FC = () => {
                       style={{ marginRight: 10 }}
                       variant="outline-dark" 
                       size="sm"
-                      onClick={() => history.push(`/consultas/detalhe/${c.id}`)}
+                      onClick={() => history.push(`/consultas/detalhe/${p.id}`)}
                     >
                       <MdSearch />
                     </Button>
@@ -151,7 +155,7 @@ const ConsultaListar: React.FC = () => {
                     <Button 
                       variant="outline-dark" 
                       size="sm"
-                      onClick={() => history.push(`/receitas/adicionar/${c.id}`)}
+                      onClick={() => history.push(`/receitas/adicionar/${p.id}`)}
                     >
                       <MdAdd />
                     </Button>
@@ -162,12 +166,18 @@ const ConsultaListar: React.FC = () => {
           </tbody>
         </Table>
 
-        <Pagination  size="sm">
-          {add_paginations(pages)}
-        </Pagination>        
+        <div className="d-flex justify-content-end">
+          <Pagination  size="sm">
+            {add_paginations(pages)}
+          </Pagination>
+        </div>   
+
+        <Button variant="dark" onClick={handleAdicionar} className="mb-3">
+          Adicionar
+        </Button>    
       </Container>
-    </>
+    </div>
   );
 }
 
-export default ConsultaListar;
+export default ProntuarioListar;

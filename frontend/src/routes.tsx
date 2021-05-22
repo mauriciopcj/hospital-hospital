@@ -9,6 +9,8 @@ import ListarReceita from './pages/Receita/Listar';
 import AddReceita from './pages/Receita/Adicionar';
 import EditarReceita from './pages/Receita/Editar';
 import DetalheConsulta from './pages/Consulta/Detalhe';
+import AddProntuario from './pages/Prontuario/Adicionar';
+import ListarProntuario from './pages/Prontuario/Listar';
 
 function Routes() {
   return (
@@ -21,6 +23,8 @@ function Routes() {
       <Route path="/receitas/index" component={ListarReceita} />
       <Route path="/receitas/adicionar/:id" exact component={AddReceita} />
       <Route path="/receitas/editar/:id" exact component={EditarReceita} />
+      <Route path="/prontuarios/index" exact component={ListarProntuario} />
+      <Route path="/prontuarios/adicionar" exact component={AddProntuario} />
     </BrowserRouter>
   )
 }

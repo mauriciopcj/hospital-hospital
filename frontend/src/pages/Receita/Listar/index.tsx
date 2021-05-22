@@ -5,7 +5,14 @@ import {
   Table,
   Container,
   Button,
+  Pagination
 } from 'react-bootstrap';
+
+import {
+  MdEdit,
+  MdSearch,
+  MdAdd,
+} from 'react-icons/md';
 
 import { 
   Header,
@@ -25,14 +32,39 @@ const ReceitaListar: React.FC = () => {
   const history = useHistory();
 
   const [consultas, setReceitas] = useState<IReceitaProps[]>();
+  const [size, setSize] = useState(10);
+  const [offset, setOffset] = useState(0);
+  const [pages, setPages] = useState(1);
 
   useEffect(() => {
-    api.get('/receitas').then(response => {
-      setReceitas(response.data.receitas);
+    get_receitas();
+  },[]);
+
+  useEffect(() => {
+    get_receitas();
+  },[size, offset]);
+
+  const get_receitas = () => {
+    api.get(`/receitas?limit=${size}&offset=${offset}`).then(response => {
+      const { receitas, count } = response.data;
+      setReceitas(receitas);
+      setPages((count % size > 0) ? Math.floor(count / size) + 1 : count / size);
     }).catch(error => {
       console.log(error);
     })
-  },[]);
+  }
+
+  const add_paginations = (pages: number) => {
+    let items = [];
+    for (let number = 0; number < pages; number++) {
+      items.push(
+        <Pagination.Item key={number} onClick={() => setOffset(number * size)} active={offset === number * size}>
+          {number + 1}
+        </Pagination.Item>,
+      );
+    }
+    return items;
+  }
 
   const items = [
     {
@@ -52,7 +84,7 @@ const ReceitaListar: React.FC = () => {
       <Header items={[...items]}/>
 
       <Container className="mt-5">
-        <Table bordered hover>
+        <Table hover size="sm">
           <thead>
             <tr>
               <th>Nome</th>
@@ -69,9 +101,9 @@ const ReceitaListar: React.FC = () => {
                   <td>{r.nome}</td>
                   <td>{r.descricao}</td>
                   <td>{r.consulta_id}</td>
-                  <td>
-                    <Button variant="outline-dark" onClick={() => history.push(`/receitas/editar/${r.id}`)}>
-                      Editar
+                  <td style={{ display: "flex", justifyContent: "flex-end" }}>
+                    <Button variant="outline-dark" size="sm" onClick={() => history.push(`/receitas/editar/${r.id}`)}>
+                      <MdEdit />
                     </Button>  
                   </td>
                 </tr>
@@ -79,6 +111,10 @@ const ReceitaListar: React.FC = () => {
             })}
           </tbody>
         </Table>
+
+        <Pagination size="sm">
+          {add_paginations(pages)}
+        </Pagination> 
       </Container>
     </>
   );

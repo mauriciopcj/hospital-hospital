@@ -30,6 +30,8 @@ const Header: React.FC<ItemsProps> = (props) => {
             <Nav className="mr-auto">
               <Nav.Link href="/">Home</Nav.Link>
 
+              <Nav.Link href="/prontuarios/index">Prontuários</Nav.Link>
+
               <Nav.Link href="/consultas/index">Consultas</Nav.Link>
 
               <Nav.Link href="/receitas/index">Receitas</Nav.Link>
@@ -38,8 +40,8 @@ const Header: React.FC<ItemsProps> = (props) => {
         </Container>
       </Navbar>
 
-      <Container>
-        <Breadcrumb>
+      <Container className="mt-3">
+        <Breadcrumb listProps={{ style: { paddingTop: 5, paddingBottom: 5 } }}>
           {items && items.map(item => (
             <Breadcrumb.Item key={item.name} href={item.href} active={item.isActive}>{item.name}</Breadcrumb.Item>
           ))}

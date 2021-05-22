@@ -105,29 +105,26 @@ const DetalheConsulta: React.FC<RouteComponentProps<TParams>> = ({ match }) => {
         </Card>
 
         <h2>Receitas</h2><br/>
-
-        {consulta && consulta.receitas.map((obj, index) => (
-          <Card key={index} style={{ marginBottom: 10 }}>
-            <Card.Body>
-              <Row>
-                <Col>
+        <Row>
+          {consulta && consulta.receitas.map((obj, index) => (
+            <Col key={index}>
+              <Card  style={{ marginBottom: 10 }}>
+                <Card.Body className="d-flex flex-column">
                   <Card.Title>{obj.nome}</Card.Title>
 
                   <Card.Text>
                     {obj.descricao}
                   </Card.Text> 
-                </Col>
-
-                <Col style={{ display: "flex", justifyContent: "flex-end" }}>
-                  <Button variant="dark" onClick={() => history.push(`/receitas/editar/${obj.id}`)}>
+                  
+                  <Button variant="outline-dark" onClick={() => history.push(`/receitas/editar/${obj.id}`)}>
                     Editar
-                  </Button>          
-                </Col>
-              </Row>
+                  </Button> 
+                </Card.Body>
+              </Card>
+            </Col>
+          ))}
+        </Row>
 
-            </Card.Body>
-          </Card>
-        ))}
       </Container>
 
     </div>
