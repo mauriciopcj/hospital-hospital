@@ -2,7 +2,7 @@
 
 module.exports = {
   up: async (queryInterface, Sequelize) => {
-    await queryInterface.createTable('receitas', { 
+    await queryInterface.createTable('cirurgias', {
       id: {
         allowNull: false,
         autoIncrement: true,
@@ -16,15 +16,24 @@ module.exports = {
       },
 
       descricao: {
-        allowNull: false,
         type: Sequelize.STRING
       },
 
-      consulta_id: {
+      data_entrada: {
+        allowNull: false,
+        type: Sequelize.DATE
+      },
+
+      data_saida: {
+        allowNull: false,
+        type: Sequelize.DATE
+      },
+
+      prontuario_id: {
         allowNull: false,
         type: Sequelize.INTEGER,
         references: {
-          model: 'consultas',
+          model: 'prontuarios',
           key: 'id'
         }
       },
@@ -42,8 +51,7 @@ module.exports = {
       }
     });
   },
-
   down: async (queryInterface, Sequelize) => {
-    await queryInterface.dropTable('receitas');
+    await queryInterface.dropTable('cirurgias');
   }
 };

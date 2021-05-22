@@ -1,8 +1,8 @@
 'use strict';
 
 module.exports = {
-  up: async (queryInterface, Sequelize) => {
-    await queryInterface.createTable('receitas', { 
+  up: async (queryInterface, Sequelize) => {    
+    await queryInterface.createTable('prontuarios', { 
       id: {
         allowNull: false,
         autoIncrement: true,
@@ -10,23 +10,19 @@ module.exports = {
         type: Sequelize.INTEGER
       },
 
-      nome: {
-        allowNull: false,
+      doencas: {
+        allowNull: true,
         type: Sequelize.STRING
       },
 
-      descricao: {
-        allowNull: false,
+      alergias: {
+        allowNull: true,
         type: Sequelize.STRING
       },
 
-      consulta_id: {
-        allowNull: false,
-        type: Sequelize.INTEGER,
-        references: {
-          model: 'consultas',
-          key: 'id'
-        }
+      medicamentos:{
+        allowNull: true,
+        type: Sequelize.STRING
       },
 
       created_at: {
@@ -41,9 +37,10 @@ module.exports = {
         type: Sequelize.DATE
       }
     });
+    
   },
 
   down: async (queryInterface, Sequelize) => {
-    await queryInterface.dropTable('receitas');
+    await queryInterface.dropTable('prontuarios');    
   }
 };

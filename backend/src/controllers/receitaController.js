@@ -31,9 +31,14 @@ export default {
   },
 
   index: async (req, res, next) => {
+    const { limit = 10, offset = 0 } = req.query;
+
     try {
-      await Receita.findAll().then(response => {
-        res.status(200).json({ receitas: response });
+      await Receita.findAndCountAll({
+        limit: parseInt(limit),
+        offset: parseInt(offset),
+      }).then(response => {
+        res.status(200).json({ count: response.count, receitas: response.rows });
       }).catch(error => {
         res.status(400).json({ error });
       });
