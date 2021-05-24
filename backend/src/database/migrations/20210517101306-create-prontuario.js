@@ -10,6 +10,11 @@ module.exports = {
         type: Sequelize.INTEGER
       },
 
+      paciente: {
+        allowNull: false,
+        type: Sequelize.STRING
+      },
+
       doencas: {
         allowNull: true,
         type: Sequelize.STRING

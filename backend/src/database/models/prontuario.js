@@ -2,6 +2,7 @@
 
 module.exports = (sequelize, DataTypes) => {
   const Prontuario = sequelize.define('Prontuario', {
+    paciente: DataTypes.STRING,
     doencas: DataTypes.STRING,
     alergias: DataTypes.STRING,
     medicamentos: DataTypes.STRING
@@ -9,10 +10,6 @@ module.exports = (sequelize, DataTypes) => {
       freezeTableName: true,
       tableName: 'prontuarios'
   });
-
-  Prontuario.associate = function(models) {
-    Prontuario.hasMany(models.Cirurgia, { as: 'cirurgias', foreignKey: 'prontuario_id' })
-  };
   
   return Prontuario;
 };

@@ -105,10 +105,8 @@ const ConsultaListar: React.FC = () => {
     <>
       <Header items={[...items]}/>
 
-      <Container className="mt-5">
-        <Button className="mb-3" variant="dark" onClick={handleAdicionar}>
-          Adicionar
-        </Button>
+      <Container>
+        <h3 className="mb-3">Consultas</h3>        
 
         <Table bordered hover size="sm">
           <thead>
@@ -162,9 +160,15 @@ const ConsultaListar: React.FC = () => {
           </tbody>
         </Table>
 
-        <Pagination  size="sm">
-          {add_paginations(pages)}
-        </Pagination>        
+        <div className="d-flex justify-content-end">
+          <Pagination  size="sm">
+            {add_paginations(pages)}
+          </Pagination>
+        </div>  
+
+        <Button className="mb-3" variant="dark" onClick={handleAdicionar}>
+          Adicionar
+        </Button>     
       </Container>
     </>
   );

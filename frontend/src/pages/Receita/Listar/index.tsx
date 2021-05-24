@@ -83,7 +83,9 @@ const ReceitaListar: React.FC = () => {
     <>
       <Header items={[...items]}/>
 
-      <Container className="mt-5">
+      <Container>
+        <h3 className="mb-3">Receitas</h3> 
+
         <Table hover size="sm">
           <thead>
             <tr>
@@ -112,9 +114,11 @@ const ReceitaListar: React.FC = () => {
           </tbody>
         </Table>
 
-        <Pagination size="sm">
-          {add_paginations(pages)}
-        </Pagination> 
+        <div className="d-flex justify-content-end">
+          <Pagination size="sm">
+            {add_paginations(pages)}
+          </Pagination>
+        </div>
       </Container>
     </>
   );

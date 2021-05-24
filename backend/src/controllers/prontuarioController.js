@@ -1,4 +1,4 @@
-import { Prontuario, Cirurgia } from '../database/models';
+import { Prontuario } from '../database/models';
 
 export default {
 
@@ -18,11 +18,7 @@ export default {
     const { limit = 10, offset = 0 } = req.query;
 
     try {
-      await Prontuario.findAndCountAll({ 
-        include: [{
-          model: Cirurgia,
-          as: 'cirurgias'
-        }],
+      await Prontuario.findAndCountAll({
         limit: parseInt(limit),
         offset: parseInt(offset),
       }).then(response => {
@@ -38,14 +34,7 @@ export default {
   show: async (req, res, next) => {
     try {
       await Prontuario.findOne({ 
-        where: { id: req.params.id },        
-        include: [{
-          model: Cirurgia,
-          as: 'cirurgias',
-          attributes: {
-            exclude: ['prontuario_id']
-          },
-        }]
+        where: { id: req.params.id }
       }).then(response => {
         res.status(200).json({ prontuario: response });
       }).catch(error => {

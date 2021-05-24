@@ -10,51 +10,18 @@ import {
 import Header from '../../../components/Header';
 
 import api from '../../../services/api';
+import UserService from '../../../services/UserService';
 
-const opcoes = [
-  {
-    label: "Usuário 1",
-    value: 1
-  },
-  {
-    label: "Usuário 2",
-    value: 2
-  },
-]
+import { 
+  doencasDefault,
+  medicamentosDefault,
+  prontuarioDefault,
+  alergiasDefault,
+} from './mock';
 
-interface ICirurgiaProps {
-  nome: string;
-  descricao: string;
-  data_entrada: string;
-  data_saida: string;
-}
-
-interface IProntuarioProps {
-  doencas: string;
-  alergias: string;
-  medicamentos: string;
-  cirurgias: ICirurgiaProps[];
-}
-
-const prontuarioDefault = {
-  doencas: "",
-  alergias: "",
-  medicamentos: "",
-  cirurgias: []
-}
-
-interface IDoencasProps {
-  cardiaca: boolean;
-  diabetes: boolean;
-  renal: boolean;
-  cancer: boolean;
-}
-
-const doencasDefault = {
-  cardiaca: false,
-  diabetes: false,
-  renal: false,
-  cancer: false,
+interface UsuarioProps {
+  id: string;
+  username: string;
 }
 
 const AdicionarProntuario: React.FC = () => {
@@ -62,19 +29,35 @@ const AdicionarProntuario: React.FC = () => {
   const history = useHistory();
 
   const [validated, setValidated] = useState(false);
-  const [prontuario, setProntuario] = useState<IProntuarioProps>(prontuarioDefault);
-  const [doencas, setDoencas] = useState<IDoencasProps>(doencasDefault);
+  const [prontuario, setProntuario] = useState(prontuarioDefault);
+  const [doencas, setDoencas] = useState(doencasDefault);
+  const [medicamentos, setMedicamentos] = useState(medicamentosDefault);
+  const [alergias, setAlergias] = useState(alergiasDefault);
+  const [usuarios, setUsuarios] = useState<UsuarioProps[]>([]);
 
   useEffect(() => {
     setProntuario(prontuarioDefault);
+    get_users();
   }, []);
 
-  useEffect(() => {
-    console.log(doencas);
-  }, [doencas]);
+  // useEffect(() => {
+  //   console.log(prontuario)
+  // }, [prontuario]);
 
   const handleCancel = () => {
     history.push('/prontuarios/index');
+  }
+
+  const get_users = async () => {
+    const result = await UserService.getAll();
+    setUsuarios(result);
+  }
+
+  const onChangePaciente = (event: any) => {
+    setProntuario({
+      ...prontuario,
+      paciente: event.target.value
+    });
   }
 
   const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
@@ -85,50 +68,47 @@ const AdicionarProntuario: React.FC = () => {
       event.stopPropagation();
     } else {
       event.preventDefault();
-  
-      api.post('/prontuarios', prontuario).then(response => {  
+
+      console.log(prontuario);
+
+      api.post('/prontuarios', format_prontuario()).then(response => {
         history.push('/prontuarios/index');
       }).catch(error => {
         console.log(error);
-      })
+      });
+
     }
     setValidated(true);
   }
 
-  // const onChangeLocal = (event: any) => {
-  //   setProntuario({
-  //     ...prontuario,
-  //     local: event.target.value
-  //   });
-  // }
+  const format_prontuario = () => {
+    let alerg = "";
+    let doen = "";
+    let medic = "";
+    for (var [key, value] of Object.entries(alergias)) {
+      if (value) {
+        alerg += key + ";";      
+      }
+    }
+    for (var [key, value] of Object.entries(doencas)) {
+      if (value) {
+        doen += key + ";";      
+      }
+    }
+    for (var [key, value] of Object.entries(medicamentos)) {
+      if (value) {
+        medic += key + ";";      
+      }
+    }
 
-  // const onChangeData = (event: any) => {
-  //   setProntuario({
-  //     ...consulta,
-  //     data: event.target.value
-  //   });
-  // }
-
-  // const onChangeMedico = (event: any) => {
-  //   setProntuario({
-  //     ...consulta,
-  //     medico: event.target.value
-  //   });
-  // }
-
-  // const onChangePaciente = (event: any) => {
-  //   setProntuario({
-  //     ...consulta,
-  //     paciente: event.target.value
-  //   });
-  // }
-
-  // const onChangeObservacoes = (event: any) => {
-  //   setProntuario({
-  //     ...consulta,
-  //     observacoes: event.target.value
-  //   });
-  // }
+    return ({
+      ...prontuario,
+      alergias: alerg,
+      doencas: doen,
+      medicamentos: medic
+    })
+  }
+ 
 
   const items = [
     {
@@ -148,17 +128,26 @@ const AdicionarProntuario: React.FC = () => {
     },
   ]
 
-  const handle_checkbox_doencas = () => {
-
-  }
-
   return (
-    <div style={{ background: "#f3f3f3", minHeight: "100vh" }}>
+    <div>
       <Header items={[...items]}/>
 
       <Container className="mt-5">
         <Form noValidate validated={validated} onSubmit={handleSubmit}>
-          <Form.Group controlId="formAddConsultaLocal">
+          {usuarios && <Form.Group controlId="formAddProntuarioPaciente">
+            <Form.Label>Paciente</Form.Label>
+            <Form.Control required as="select" onChange={onChangePaciente}>
+              <option value={''}>Selecione um paciente</option>
+              {usuarios.map(item => {
+                return (<option key={item.id} value={item.id}>{item.username}</option>)
+              })}
+            </Form.Control>
+            <Form.Control.Feedback type="invalid">
+              Por favor selecione um paciente.
+            </Form.Control.Feedback>
+          </Form.Group>}
+
+          <Form.Group controlId="formAddProntuarioDoencas">
             <Form.Label>Histórico de doenças</Form.Label>
             <Form.Check 
               checked={doencas.cardiaca}
@@ -186,63 +175,61 @@ const AdicionarProntuario: React.FC = () => {
             />
           </Form.Group>
 
-          <Form.Group controlId="formAddConsultaLocal">
+          <Form.Group controlId="formAddProntuarioMedicamentos">
             <Form.Label>Medicamentos</Form.Label>
-              <Form.Check 
-                checked={doencas.cardiaca}
-                onChange={() => setDoencas({...doencas, cardiaca: !doencas.cardiaca })}
-                type="checkbox"
-                label="cardiaca"
-              />
-              <Form.Check 
-                checked={doencas.diabetes}
-                onChange={() => setDoencas({...doencas, diabetes: !doencas.diabetes})}
-                type="checkbox"
-                label="diabetes"
-              />
-              <Form.Check 
-                checked={doencas.renal}
-                onChange={() => setDoencas({...doencas, renal: !doencas.renal})}
-                type="checkbox"
-                label="renal"
-              />
-              <Form.Check 
-                checked={doencas.cancer}
-                onChange={() => setDoencas({...doencas, cancer: !doencas.cancer})}
-                type="checkbox"
-                label="cancer"
-              />
-            </Form.Group>
+            <Form.Check 
+              checked={medicamentos.insonia}
+              onChange={() => setMedicamentos({...medicamentos, insonia: !medicamentos.insonia })}
+              type="checkbox"
+              label="insonia"
+            />
+            <Form.Check 
+              checked={medicamentos.rins}
+              onChange={() => setMedicamentos({...medicamentos, rins: !medicamentos.rins })}
+              type="checkbox"
+              label="rins"
+            />
+            <Form.Check 
+              checked={medicamentos.coluna}
+              onChange={() => setMedicamentos({...medicamentos, coluna: !medicamentos.coluna })}
+              type="checkbox"
+              label="coluna"
+            />
+            <Form.Check 
+              checked={medicamentos.coracao}
+              onChange={() => setMedicamentos({...medicamentos, coracao: !medicamentos.coracao })}
+              type="checkbox"
+              label="coracao"
+            />
+            <Form.Check 
+              checked={medicamentos.diabetes}
+              onChange={() => setMedicamentos({...medicamentos, diabetes: !medicamentos.diabetes })}
+              type="checkbox"
+              label="diabetes"
+            />
+          </Form.Group>
 
-            <Form.Group controlId="formAddConsultaLocal">
-              <Form.Label>Alergias</Form.Label>
-                <Form.Check 
-                  checked={doencas.cardiaca}
-                  onChange={() => setDoencas({...doencas, cardiaca: !doencas.cardiaca })}
-                  type="checkbox"
-                  label="cardiaca"
-                />
-                <Form.Check 
-                  checked={doencas.diabetes}
-                  onChange={() => setDoencas({...doencas, diabetes: !doencas.diabetes})}
-                  type="checkbox"
-                  label="diabetes"
-                />
-                <Form.Check 
-                  checked={doencas.renal}
-                  onChange={() => setDoencas({...doencas, renal: !doencas.renal})}
-                  type="checkbox"
-                  label="renal"
-                />
-                <Form.Check 
-                  checked={doencas.cancer}
-                  onChange={() => setDoencas({...doencas, cancer: !doencas.cancer})}
-                  type="checkbox"
-                  label="cancer"
-                />
-              </Form.Group>
-          
-          
+          <Form.Group controlId="formAddProntuarioAlergias">
+            <Form.Label>Alergias</Form.Label>
+            <Form.Check 
+              checked={alergias.lactose}
+              onChange={() => setAlergias({...alergias, lactose: !alergias.lactose })}
+              type="checkbox"
+              label="lactose"
+            />
+            <Form.Check 
+              checked={alergias.cereais}
+              onChange={() => setAlergias({...alergias, cereais: !alergias.cereais })}
+              type="checkbox"
+              label="cereais"
+            />
+            <Form.Check 
+              checked={alergias.trigo}
+              onChange={() => setAlergias({...alergias, trigo: !alergias.trigo })}
+              type="checkbox"
+              label="trigo"
+            />
+          </Form.Group>          
 
           <Button variant="outline-dark" className="mr-3" onClick={handleCancel}>
             Cancelar

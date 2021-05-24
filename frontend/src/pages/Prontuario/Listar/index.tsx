@@ -20,6 +20,7 @@ import {
 } from '../../../components';
 
 import api from '../../../services/api';
+import UserService from '../../../services/UserService';
 
 interface ICirurgiaProps {
   id: number;
@@ -31,10 +32,10 @@ interface ICirurgiaProps {
 
 interface IProntuarioProps {
   id: number;
+  paciente: string;
   doencas: string;
   alergias: string;
   medicamentos: string;
-  cirurgias: ICirurgiaProps[];
 }
 
 const opcoes = [
@@ -48,6 +49,11 @@ const opcoes = [
   },
 ]
 
+interface UsuarioProps {
+  id: string;
+  username: string;
+}
+
 const ProntuarioListar: React.FC = () => {
 
   const history = useHistory();
@@ -56,14 +62,21 @@ const ProntuarioListar: React.FC = () => {
   const [size, setSize] = useState(10);
   const [offset, setOffset] = useState(0);
   const [pages, setPages] = useState(1);
+  const [usuarios, setUsuarios] = useState<UsuarioProps[]>([]);
 
   useEffect(() => {
     get_prontuarios();
+    get_users();
   },[]);
 
   useEffect(() => {
     get_prontuarios();
   },[size, offset]);
+
+  const get_users = async () => {
+    const result = await UserService.getAll();
+    setUsuarios(result);
+  }
 
   const get_prontuarios = () => {
     api.get(`/prontuarios?limit=${size}&offset=${offset}`).then(response => {
@@ -109,7 +122,7 @@ const ProntuarioListar: React.FC = () => {
   ]
 
   return (
-    <div style={{ background: "#f3f3f3", minHeight: "100vh" }}>
+    <div>
       <Header items={[...items]}/>
 
       <Container>
@@ -119,6 +132,8 @@ const ProntuarioListar: React.FC = () => {
         <Table hover size="sm">
           <thead>
             <tr>
+              <th>ID</th>
+              <th>Paciente</th>
               <th>Doenças</th>
               <th>Medicamentos</th>
               <th>Alergias</th>
@@ -130,6 +145,8 @@ const ProntuarioListar: React.FC = () => {
             {prontuarios && prontuarios.map(p => {
               return (
                 <tr key={"pront_list_item_" + p.id}>
+                  <td>{p.id}</td>
+                  <td>{p.paciente}</td>
                   <td>{p.doencas}</td>
                   <td>{p.medicamentos}</td>
                   <td>{p.alergias}</td>
@@ -141,23 +158,6 @@ const ProntuarioListar: React.FC = () => {
                       onClick={() => history.push(`/consultas/editar/${p.id}`)}
                     >
                       <MdEdit />
-                    </Button> 
-
-                    <Button 
-                      style={{ marginRight: 10 }}
-                      variant="outline-dark" 
-                      size="sm"
-                      onClick={() => history.push(`/consultas/detalhe/${p.id}`)}
-                    >
-                      <MdSearch />
-                    </Button>
-
-                    <Button 
-                      variant="outline-dark" 
-                      size="sm"
-                      onClick={() => history.push(`/receitas/adicionar/${p.id}`)}
-                    >
-                      <MdAdd />
                     </Button>
                   </td>
                 </tr>
