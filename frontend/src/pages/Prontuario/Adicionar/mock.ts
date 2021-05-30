@@ -5,7 +5,7 @@ interface IDoencasProps {
   cancer: boolean;
 }
 
-const doencasDefault: IDoencasProps = {
+const doencasDefault: IDoencasProps & Object = {
   cardiaca: false,
   diabetes: false,
   renal: false,

@@ -155,7 +155,7 @@ const ProntuarioListar: React.FC = () => {
                       style={{ marginRight: 10 }}
                       variant="outline-dark" 
                       size="sm"
-                      onClick={() => history.push(`/consultas/editar/${p.id}`)}
+                      onClick={() => history.push(`/prontuarios/editar/${p.id}`)}
                     >
                       <MdEdit />
                     </Button>

@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { useHistory } from 'react-router';
+import { RouteComponentProps, useHistory } from 'react-router';
 
 import {
   Button,
@@ -13,21 +13,25 @@ import Header from '../../../components/Header';
 
 import api from '../../../services/api';
 import UserService from '../../../services/UserService';
+import { styles } from './styles';
 
 import { 
   doencasDefault,
   medicamentosDefault,
   prontuarioDefault,
   alergiasDefault,
-} from './mock';
-import { styles } from '../Editar/styles';
+} from '../Adicionar/mock';
 
 interface UsuarioProps {
   id: string;
   username: string;
 }
 
-const AdicionarProntuario: React.FC = () => {
+type TParams = { id: string };
+
+const EditarProntuario: React.FC<RouteComponentProps<TParams>> = ({ match }) => {
+
+  const { id } = match.params;
 
   const history = useHistory();
 
@@ -38,14 +42,42 @@ const AdicionarProntuario: React.FC = () => {
   const [alergias, setAlergias] = useState(alergiasDefault);
   const [usuarios, setUsuarios] = useState<UsuarioProps[]>([]);
 
-  useEffect(() => {
-    setProntuario(prontuarioDefault);
-    get_users();
-  }, []);
 
-  // useEffect(() => {
-  //   console.log(prontuario)
-  // }, [prontuario]);
+  useEffect(() => {
+    get_users();
+
+    api.get(`/prontuarios/${id}`).then(response => {
+      const { id, paciente, doencas: d, alergias: a, medicamentos: m } = response.data.prontuario;
+
+      let arr_d = d.split(";");
+      let arr_a = a.split(";");
+      let arr_m = m.split(";");
+
+      let res_doencas = doencas;
+      let res_alergias = alergias;
+      let res_medicamentos = medicamentos;
+
+      for (let i in d.split(";")) {
+        let res = Object.keys(doencas).find((key) => key === arr_d[i]);
+        res && (res_doencas = { ...res_doencas, [res]: true});
+      }      
+      for (let i in a.split(";")) {
+        let res = Object.keys(alergias).find(key => key === arr_a[i]);
+        res && (res_alergias = { ...res_alergias, [res]: true});
+      }
+      for (let i in m.split(";")) {
+        let res = Object.keys(medicamentos).find(key => key === arr_m[i]);
+        res && (res_medicamentos = { ...res_medicamentos, [res]: true});
+      }
+
+      setDoencas({...doencas, ...res_doencas});
+      setAlergias({...alergias, ...res_alergias});
+      setMedicamentos({...medicamentos, ...res_medicamentos});
+      setProntuario({ ...prontuario, paciente: paciente });
+    }).catch(error => {
+      console.log(error);
+    });    
+  }, []);
 
   const handleCancel = () => {
     history.push('/prontuarios/index');
@@ -74,7 +106,7 @@ const AdicionarProntuario: React.FC = () => {
 
       console.log(prontuario);
 
-      api.post('/prontuarios', format_prontuario()).then(response => {
+      api.put(`/prontuarios/${id}`, format_prontuario()).then(response => {
         history.push('/prontuarios/index');
       }).catch(error => {
         console.log(error);
@@ -125,8 +157,8 @@ const AdicionarProntuario: React.FC = () => {
       isActive: false,
     },
     {
-      href: "/prontuarios/adicionar",
-      name: "Adicionar",
+      href: "/prontuarios/editar",
+      name: "Editar",
       isActive: true,
     },
   ]
@@ -137,9 +169,9 @@ const AdicionarProntuario: React.FC = () => {
 
       <Container className="mt-5">
         <Form noValidate validated={validated} onSubmit={handleSubmit}>
-          {usuarios && <Form.Group controlId="formAddProntuarioPaciente">
+          {usuarios && <Form.Group controlId="formEditProntuarioPaciente">
             <Form.Label>Paciente</Form.Label>
-            <Form.Control required as="select" onChange={onChangePaciente}>
+            <Form.Control required disabled as="select" value={prontuario.paciente} onChange={onChangePaciente}>
               <option value={''}>Selecione um paciente</option>
               {usuarios.map(item => {
                 return (<option key={item.id} value={item.id}>{item.username}</option>)
@@ -148,11 +180,10 @@ const AdicionarProntuario: React.FC = () => {
             <Form.Control.Feedback type="invalid">
               Por favor selecione um paciente.
             </Form.Control.Feedback>
-          </Form.Group>}
-
+          </Form.Group>}            
           <Row style={styles.checkbox_group}>
             <Col>
-              <Form.Group controlId="formAddProntuarioDoencas">
+              <Form.Group controlId="formEditProntuarioDoencas">
                 <Form.Label>Histórico de doenças</Form.Label>
                 <Form.Check 
                   checked={doencas.cardiaca}
@@ -181,7 +212,7 @@ const AdicionarProntuario: React.FC = () => {
               </Form.Group>
             </Col>
             <Col>
-              <Form.Group controlId="formAddProntuarioMedicamentos">
+              <Form.Group controlId="formEditProntuarioMedicamentos">
                 <Form.Label>Medicamentos</Form.Label>
                 <Form.Check 
                   checked={medicamentos.insonia}
@@ -216,7 +247,7 @@ const AdicionarProntuario: React.FC = () => {
               </Form.Group>
             </Col>
             <Col>
-              <Form.Group controlId="formAddProntuarioAlergias">
+              <Form.Group controlId="formEditProntuarioAlergias">
                 <Form.Label>Alergias</Form.Label>
                 <Form.Check 
                   checked={alergias.lactose}
@@ -238,7 +269,8 @@ const AdicionarProntuario: React.FC = () => {
                 />
               </Form.Group>          
             </Col>
-          </Row>         
+          </Row>
+
 
           <Button variant="outline-dark" className="mr-3" onClick={handleCancel}>
             Cancelar
@@ -253,4 +285,4 @@ const AdicionarProntuario: React.FC = () => {
   );
 }
 
-export default AdicionarProntuario;
+export default EditarProntuario;

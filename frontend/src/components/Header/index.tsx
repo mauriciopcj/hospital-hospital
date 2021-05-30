@@ -35,6 +35,8 @@ const Header: React.FC<ItemsProps> = (props) => {
               <Nav.Link href="/consultas/index">Consultas</Nav.Link>
 
               <Nav.Link href="/receitas/index">Receitas</Nav.Link>
+
+              <Nav.Link href="/login">Login</Nav.Link>
             </Nav>
           </Navbar.Collapse>
         </Container>
