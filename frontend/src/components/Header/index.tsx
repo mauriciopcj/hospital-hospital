@@ -1,4 +1,5 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
+import AuthService from '../../services/AuthService';
 
 import {
   Breadcrumb,
@@ -6,6 +7,7 @@ import {
   Nav,
   Navbar,
 } from 'react-bootstrap';
+import { useHistory } from 'react-router';
 
 interface ItemsProps {
   items: ItemProps[];
@@ -17,8 +19,29 @@ interface ItemProps {
   isActive: boolean;
 }
 
+
 const Header: React.FC<ItemsProps> = (props) => {
   const items = props.items;
+  const [username, setUsername] = useState("");
+  const [authority, setAuthority] = useState("");
+
+  const history = useHistory();
+
+  useEffect(() => {
+    const { username: user, authority: auth} = AuthService.getUser();
+    if (user && auth) {
+      setUsername(user);
+      setAuthority(auth);
+    }
+    if (!user && auth !== "ADMIN") {
+      history.push("/login");
+    }
+  }, []);
+
+  const logout = () => {
+    AuthService.logout();
+    history.push("/login");
+  }
 
   return (
     <div>
@@ -36,7 +59,8 @@ const Header: React.FC<ItemsProps> = (props) => {
 
               <Nav.Link href="/receitas/index">Receitas</Nav.Link>
 
-              <Nav.Link href="/login">Login</Nav.Link>
+              {!username && <Nav.Link href="/login">Login</Nav.Link>}
+              {username && <Nav.Link onClick={logout}>Logout</Nav.Link>}
             </Nav>
           </Navbar.Collapse>
         </Container>

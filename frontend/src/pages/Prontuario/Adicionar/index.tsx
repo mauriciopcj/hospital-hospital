@@ -25,6 +25,8 @@ import { styles } from '../Editar/styles';
 interface UsuarioProps {
   id: string;
   username: string;
+  name: string;
+  authority: string;
 }
 
 const AdicionarProntuario: React.FC = () => {
@@ -142,7 +144,7 @@ const AdicionarProntuario: React.FC = () => {
             <Form.Control required as="select" onChange={onChangePaciente}>
               <option value={''}>Selecione um paciente</option>
               {usuarios.map(item => {
-                return (<option key={item.id} value={item.id}>{item.username}</option>)
+                return (<option key={item.id} value={item.id}>{item.name}</option>)
               })}
             </Form.Control>
             <Form.Control.Feedback type="invalid">
