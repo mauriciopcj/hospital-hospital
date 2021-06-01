@@ -38,6 +38,8 @@ const consultaDefault = {
   observacoes: ''
 }
 
+import AuthService from '../../../services/AuthService';
+
 const AdicionarConsulta: React.FC = () => {
 
   const history = useHistory();
@@ -46,6 +48,8 @@ const AdicionarConsulta: React.FC = () => {
   const [consulta, setConsulta] = useState<IConsultaProps>(consultaDefault);
 
   useEffect(() => {
+    AuthService.getUser()
+
     setConsulta(consultaDefault);
   }, []);
 

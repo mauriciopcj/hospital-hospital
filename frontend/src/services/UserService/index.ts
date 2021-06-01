@@ -21,7 +21,6 @@ const UserService = {
   getAll: async () => {
     const header = get_headers();
     const { data: { accounts } } = await axios.get(baseUrl + "/accounts", header);
-    console.log(accounts)
     return accounts;
   },
 
