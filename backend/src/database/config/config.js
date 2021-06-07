@@ -2,10 +2,10 @@ require('dotenv').config();
 
 module.exports = {
     "development": {
-        "host": "localhost",
-        "username": "root",
-        "password": process.env.MYSQL_ROOT_PASSWORD,
-        "database": process.env.MYSQL_DATABASE,
+        "host": process.env.PASSWORD,
+        "username": process.env.USER,
+        "password": process.env.ROOT_PASSWORD,
+        "database": process.env.DATABASE,
         "migrationStorageTableName": "sequelize_meta",
         "dialect": "mysql",
         "operatorsAliases": 0,
